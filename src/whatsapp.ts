@@ -1,4 +1,10 @@
-import {Client, ClientOptions, LocalAuth, Message} from 'whatsapp-web.js';
+import {
+  Client,
+  ClientOptions,
+  LocalAuth,
+  Message,
+  MessageTypes,
+} from 'whatsapp-web.js';
 import {config, WhatsappConfig} from './config';
 import {AudioTranscriber} from './audio';
 
@@ -12,7 +18,7 @@ export class WhatsappClient {
     const clientOptions: ClientOptions = {
       authStrategy: auth,
       puppeteer: {
-        headless: false,
+        headless: true,
         args: ['--no-sandbox'],
       },
     };
@@ -50,8 +56,20 @@ export class WhatsappClient {
     this.client.initialize();
   }
 
+  private isAudioMessage(message: Message): boolean {
+    switch (message.type) {
+      case MessageTypes.AUDIO:
+      case MessageTypes.VOICE:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   private async shouldTranscribe(message: Message): Promise<boolean> {
-    if (message.type !== 'ptt') return false;
+    if (!this.isAudioMessage(message)) {
+      return false;
+    }
     const contact = await message.getContact();
     const number = contact.number;
     if (this.config.transcription.blacklist.includes(number)) {
