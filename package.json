@@ -1,0 +1,21 @@
+{
+  "name": "water",
+  "version": "0.0.0",
+  "main": "build/src/index.js",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "gts": "^5.2.0",
+    "typescript": "~5.2.0",
+    "@types/node": "20.8.2"
+  },
+  "scripts": {
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "yarn run compile",
+    "pretest": "yarn run compile",
+    "posttest": "yarn run lint",
+    "start": "node build/src/index.js"
+  }
+}
