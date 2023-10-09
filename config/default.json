@@ -1,0 +1,13 @@
+{
+    "whatsapp": {
+        "transcription": {
+            "allowAll": true,
+            "whitelist": [],
+            "blacklist": [],
+            "message": {
+                "mode": "self",
+                "template": "🤖💬 in {chat} from {author}\n{text}"
+            }
+        }
+    }
+}

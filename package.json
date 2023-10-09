@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "main": "build/src/index.js",
   "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
+    "@types/node": "20.8.2",
     "gts": "^5.2.0",
-    "typescript": "~5.2.0",
-    "@types/node": "20.8.2"
+    "typescript": "~5.2.0"
   },
   "scripts": {
     "lint": "gts lint",
@@ -17,5 +20,11 @@
     "pretest": "yarn run compile",
     "posttest": "yarn run lint",
     "start": "node build/src/index.js"
+  },
+  "dependencies": {
+    "@types/config": "^3.3.1",
+    "config": "^3.3.9",
+    "openai": "^4.11.1",
+    "whatsapp-web.js": "git+https://github.com/pedroslopez/whatsapp-web.js.git"
   }
 }
