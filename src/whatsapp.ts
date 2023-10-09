@@ -133,6 +133,9 @@ export class WhatsappClient {
     } catch (e) {
       console.error(e);
       console.error(
+        'Offending message: ' + (await this.debugMessageString(message))
+      );
+      console.error(
         `Message media type: ${media.mimetype} size ${media.filesize} filename ${media.filename}`
       );
     }
