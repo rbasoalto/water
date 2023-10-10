@@ -3,6 +3,7 @@ import {
   ClientOptions,
   LocalAuth,
   Message,
+  MessageMedia,
   MessageTypes,
 } from 'whatsapp-web.js';
 import {config, WhatsappConfig} from './config';
@@ -57,13 +58,7 @@ export class WhatsappClient {
   }
 
   private isAudioMessage(message: Message): boolean {
-    switch (message.type) {
-      case MessageTypes.AUDIO:
-      case MessageTypes.VOICE:
-        return true;
-      default:
-        return false;
-    }
+    return [MessageTypes.AUDIO, MessageTypes.VOICE].includes(message.type);
   }
 
   private async shouldTranscribe(message: Message): Promise<boolean> {
@@ -106,6 +101,19 @@ export class WhatsappClient {
     });
   }
 
+  private isAudioMessageAndMedia(
+    message: Message,
+    media: MessageMedia
+  ): boolean {
+    if (!this.isAudioMessage(message)) {
+      return false;
+    }
+    if (!media.mimetype.startsWith('audio/')) {
+      return false;
+    }
+    return true;
+  }
+
   async transcribeAndSendMessage(message: Message): Promise<void> {
     if (!message.hasMedia) return;
     const media = await message.downloadMedia();
@@ -114,6 +122,11 @@ export class WhatsappClient {
       `Will try to transcribe media type ${media.mimetype} (${media.filename})` +
         ` ${media.filesize} bytes, duration ${message.duration}s`
     );
+    if (!this.isAudioMessageAndMedia(message, media)) {
+      console.warn('Non-audio message made it to transcribeAndSendMessage');
+      console.warn('Message:' + this.debugMessageString(message));
+      return;
+    }
     try {
       const transcribedText = await this.transcriber.transcribeAudio(contents);
 
