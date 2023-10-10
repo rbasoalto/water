@@ -124,7 +124,7 @@ export class WhatsappClient {
     );
     if (!this.isAudioMessageAndMedia(message, media)) {
       console.warn('Non-audio message made it to transcribeAndSendMessage');
-      console.warn('Message:' + this.debugMessageString(message));
+      console.warn('Message: ' + (await this.debugMessageString(message)));
       return;
     }
     try {
