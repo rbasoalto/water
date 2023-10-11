@@ -7,8 +7,14 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.7",
+    "@types/config": "^3.3.1",
+    "@types/mocha": "^10.0.2",
     "@types/node": "20.8.2",
+    "chai": "^4.3.10",
     "gts": "^5.2.0",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1",
     "typescript": "~5.2.0"
   },
   "scripts": {
@@ -19,12 +25,13 @@
     "prepare": "yarn run compile",
     "pretest": "yarn run compile",
     "posttest": "yarn run lint",
-    "start": "node build/src/index.js"
+    "start": "node build/src/index.js",
+    "test": "mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
-    "@types/config": "^3.3.1",
     "config": "^3.3.9",
     "openai": "^4.11.1",
+    "sqlite3": "^5.1.6",
     "whatsapp-web.js": "git+https://github.com/pedroslopez/whatsapp-web.js.git",
     "winston": "^3.11.0",
     "winston-transport": "^4.5.0"
