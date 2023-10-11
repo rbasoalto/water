@@ -8,6 +8,8 @@ import {
 } from 'whatsapp-web.js';
 import {config, WhatsappConfig} from './config';
 import {AudioTranscriber} from './audio';
+import {logger} from './logger';
+import {Stash} from './types';
 
 export class WhatsappClient {
   private client: Client;
@@ -29,29 +31,29 @@ export class WhatsappClient {
 
   initialize() {
     this.client.on('qr', qr => {
-      console.log('QR ready', qr);
+      logger.info('QR ready', {qr});
     });
 
     this.client.on('loading_screen', (percent, message) => {
-      console.log(`Loading: ${percent}% ${message}`);
+      logger.debug(`Loading: ${percent}% ${message}`);
     });
 
     this.client.on('auth_failure', msg => {
-      console.error('Auth failure', msg);
+      logger.error('Auth failure', msg);
     });
 
     this.client.on('authenticated', session => {
-      console.log('Authenticated', session);
+      logger.info('Authenticated', session);
     });
 
     this.client.on('ready', () => {
-      console.log('this.client is ready!');
+      logger.info('Client is ready!');
     });
 
     this.client.on('message', message => this.onMessage(message));
 
     this.client.on('change_state', state => {
-      console.log('this.client state changed', state);
+      logger.info('Client state changed', state);
     });
 
     this.client.initialize();
@@ -118,13 +120,15 @@ export class WhatsappClient {
     if (!message.hasMedia) return;
     const media = await message.downloadMedia();
     const contents = Buffer.from(media.data, 'base64');
-    console.debug(
-      `Will try to transcribe media type ${media.mimetype} (${media.filename})` +
-        ` ${media.filesize} bytes, duration ${message.duration}s`
+    logger.debug(
+      'Will try to transcribe media',
+      await this.debugMessageInfo(message, media)
     );
     if (!this.isAudioMessageAndMedia(message, media)) {
-      console.warn('Non-audio message made it to transcribeAndSendMessage');
-      console.warn('Message: ' + (await this.debugMessageString(message)));
+      logger.warn(
+        'Non-audio message made it to transcribeAndSendMessage',
+        await this.debugMessageInfo(message, media)
+      );
       return;
     }
     try {
@@ -144,24 +148,30 @@ export class WhatsappClient {
           break;
       }
     } catch (e) {
-      console.error(e);
-      console.error(
-        'Offending message: ' + (await this.debugMessageString(message))
-      );
-      console.error(
-        `Message media type: ${media.mimetype} size ${media.filesize} filename ${media.filename}`
-      );
+      logger.error('Error transcribing message', e);
+      logger.error('Offending message', await this.debugMessageInfo(message));
     }
   }
 
   async onMessage(message: Message): Promise<void> {
-    console.debug(await this.debugMessageString(message));
+    logger.debug('Received message', await this.debugMessageInfo(message));
     if (this.shouldTranscribe(message)) {
       await this.transcribeAndSendMessage(message);
     }
   }
 
-  async debugMessageString(message: Message): Promise<string> {
+  debugMediaInfo(media: MessageMedia): Stash {
+    return {
+      mimetype: media.mimetype,
+      filename: media.filename,
+      size: media.filesize,
+    };
+  }
+
+  async debugMessageInfo(
+    message: Message,
+    media?: MessageMedia
+  ): Promise<Stash> {
     const chat = await message.getChat();
     const chatName: string = chat.name;
     let author: string = message.from;
@@ -170,6 +180,13 @@ export class WhatsappClient {
     }
     const fromContact = await message.getContact();
     const contactDisplayName = fromContact.name ?? fromContact.pushname;
-    return `[${message.type}] on "${chatName}" (${chat.id._serialized}) from "${contactDisplayName}" (${author})`;
+    return {
+      type: message.type,
+      chat: chatName,
+      chatId: chat.id._serialized,
+      author: contactDisplayName,
+      authorId: author,
+      ...(media ? this.debugMediaInfo(media) : {}),
+    };
   }
 }
