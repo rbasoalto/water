@@ -160,7 +160,7 @@ export class WhatsappClient {
 
   async onMessage(message: Message): Promise<void> {
     logger.debug('Received message', await this.debugMessageInfo(message));
-    if (this.shouldTranscribe(message)) {
+    if (await this.shouldTranscribe(message)) {
       await this.transcribeAndSendMessage(message);
     }
   }
