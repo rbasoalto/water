@@ -6,7 +6,7 @@
             "blacklist": [],
             "message": {
                 "mode": "self",
-                "template": "🤖💬 in {chat} from {author}\n{text}"
+                "template": "🤖💬 in {chat} from {author}\n\n{text}"
             }
         }
     }
