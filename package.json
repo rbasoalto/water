@@ -28,5 +28,8 @@
     "whatsapp-web.js": "git+https://github.com/pedroslopez/whatsapp-web.js.git",
     "winston": "^3.11.0",
     "winston-transport": "^4.5.0"
+  },
+  "resolutions": {
+    "puppeteer": "^21.3.8"
   }
 }

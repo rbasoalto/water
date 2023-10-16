@@ -21,8 +21,9 @@ export class WhatsappClient {
     const clientOptions: ClientOptions = {
       authStrategy: auth,
       puppeteer: {
-        headless: true,
-        args: ['--no-sandbox'],
+        headless: 'new',
+        debuggingPort: 12345,
+        args: ['--disable-gpu'],
       },
     };
 
@@ -117,21 +118,21 @@ export class WhatsappClient {
   }
 
   async transcribeAndSendMessage(message: Message): Promise<void> {
-    if (!message.hasMedia) return;
-    const media = await message.downloadMedia();
-    const contents = Buffer.from(media.data, 'base64');
-    logger.debug(
-      'Will try to transcribe media',
-      await this.debugMessageInfo(message, media)
-    );
-    if (!this.isAudioMessageAndMedia(message, media)) {
-      logger.warn(
-        'Non-audio message made it to transcribeAndSendMessage',
+    try {
+      if (!message.hasMedia) return;
+      const media = await message.downloadMedia();
+      const contents = Buffer.from(media.data, 'base64');
+      logger.debug(
+        'Will try to transcribe media',
         await this.debugMessageInfo(message, media)
       );
-      return;
-    }
-    try {
+      if (!this.isAudioMessageAndMedia(message, media)) {
+        logger.warn(
+          'Non-audio message made it to transcribeAndSendMessage',
+          await this.debugMessageInfo(message, media)
+        );
+        return;
+      }
       const transcribedText = await this.transcriber.transcribeAudio(contents);
 
       const renderedText = await this.renderTranscriptionInTemplate(
