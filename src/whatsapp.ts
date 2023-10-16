@@ -68,6 +68,10 @@ export class WhatsappClient {
     if (!this.isAudioMessage(message)) {
       return false;
     }
+    logger.debug(
+      'Should transcribe: true (pending filters)',
+      this.debugMessageInfo(message)
+    );
     const contact = await message.getContact();
     const number = contact.number;
     if (this.config.transcription.blacklist.includes(number)) {
