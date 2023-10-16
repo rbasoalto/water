@@ -30,7 +30,7 @@ export class WhatsappClient {
     this.client = new Client(clientOptions);
   }
 
-  initialize() {
+  async initialize() {
     this.client.on('qr', qr => {
       logger.info('QR ready', {qr});
     });
@@ -51,13 +51,17 @@ export class WhatsappClient {
       logger.info('Client is ready!');
     });
 
-    this.client.on('message', message => this.onMessage(message));
+    this.client.on('message', message => {
+      this.onMessage(message).catch(e => {
+        logger.error('Error handling message', e);
+      });
+    });
 
     this.client.on('change_state', state => {
       logger.info('Client state changed', state);
     });
 
-    this.client.initialize();
+    await this.client.initialize();
   }
 
   private isAudioMessage(message: Message): boolean {
