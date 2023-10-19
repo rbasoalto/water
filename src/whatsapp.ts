@@ -199,4 +199,8 @@ export class WhatsappClient {
       ...(media ? this.debugMediaInfo(media) : {}),
     };
   }
+
+  public async close(): Promise<void> {
+    await this.client.destroy();
+  }
 }
