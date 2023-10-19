@@ -1,6 +1,7 @@
 import {
   Client,
   ClientOptions,
+  Events,
   LocalAuth,
   Message,
   MessageMedia,
@@ -35,29 +36,29 @@ export class WhatsappClient {
       logger.info('QR ready', {qr});
     });
 
-    this.client.on('loading_screen', (percent, message) => {
+    this.client.on(Events.LOADING_SCREEN, (percent, message) => {
       logger.debug(`Loading: ${percent}% ${message}`);
     });
 
-    this.client.on('auth_failure', msg => {
+    this.client.on(Events.AUTHENTICATION_FAILURE, msg => {
       logger.error('Auth failure', msg);
     });
 
-    this.client.on('authenticated', session => {
+    this.client.on(Events.AUTHENTICATED, session => {
       logger.info('Authenticated', session);
     });
 
-    this.client.on('ready', () => {
+    this.client.on(Events.READY, () => {
       logger.info('Client is ready!');
     });
 
-    this.client.on('message', message => {
+    this.client.on(Events.MESSAGE_CREATE, message => {
       this.onMessage(message).catch(e => {
         logger.error('Error handling message', e);
       });
     });
 
-    this.client.on('change_state', state => {
+    this.client.on(Events.STATE_CHANGED, state => {
       logger.info('Client state changed', state);
     });
 
