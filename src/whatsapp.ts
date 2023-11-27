@@ -41,11 +41,11 @@ export class WhatsappClient {
     });
 
     this.client.on(Events.AUTHENTICATION_FAILURE, msg => {
-      logger.error('Auth failure', msg);
+      logger.error(`Auth failure: ${msg}`);
     });
 
-    this.client.on(Events.AUTHENTICATED, session => {
-      logger.info('Authenticated', session);
+    this.client.on(Events.AUTHENTICATED, () => {
+      logger.info('Authenticated');
     });
 
     this.client.on(Events.READY, () => {
@@ -59,7 +59,11 @@ export class WhatsappClient {
     });
 
     this.client.on(Events.STATE_CHANGED, state => {
-      logger.info('Client state changed', state);
+      logger.info(`Client state changed: ${state}`);
+    });
+
+    this.client.on(Events.DISCONNECTED, reason => {
+      logger.info(`Disconnected: ${reason}`);
     });
 
     await this.client.initialize();
